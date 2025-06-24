@@ -4,7 +4,7 @@ WORKDIR /usr/src/axoma
 
 COPY src/client/package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
