@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - develop
+      - master
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  installation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: src/client/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src/client
+  
+  lint:
+    needs: installation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: src/client/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src/client
+
+      - name: Set Hashes for nx affected command
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run linting
+        run: npx nx affected --target=lint
+        working-directory: src/client
+
+  build:
+    needs: installation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: src/client/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src/client
+
+      - name: Set Hashes for nx affected command
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run build
+        run: npx nx affected --target=build
+        working-directory: src/client
+
+  test:
+    needs: installation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: src/client/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src/client
+
+      - name: Set Hashes for nx affected command
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run tests
+        run: npx nx affected --target=test
+        working-directory: src/client
