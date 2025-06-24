@@ -11,6 +11,7 @@ permissions:
   contents: read
 
 jobs:
+  # Installing and caching dependencies
   installation:
     runs-on: ubuntu-latest
     steps:
@@ -26,10 +27,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: src/client/package-lock.json
           
-      - name: Install dependencies
-        run: npm ci
-        working-directory: src/client
+      # - name: Install dependencies
+      #   run: npm ci
+      #   working-directory: src/client
   
+  # Linting
   lint:
     needs: installation
     runs-on: ubuntu-latest
@@ -57,6 +59,7 @@ jobs:
         run: npx nx affected --target=lint
         working-directory: src/client
 
+  # Build
   build:
     needs: installation
     runs-on: ubuntu-latest
@@ -84,6 +87,7 @@ jobs:
         run: npx nx affected --target=build
         working-directory: src/client
 
+  # Unit tests
   test:
     needs: installation
     runs-on: ubuntu-latest
@@ -109,4 +113,32 @@ jobs:
 
       - name: Run tests
         run: npx nx affected --target=test
+        working-directory: src/client
+
+  # End-to-end tests
+  e2e:
+    needs: installation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: src/client/package-lock.json
+          
+      - name: Install dependencies
+        run: npm ci
+        working-directory: src/client
+
+      - name: Set Hashes for nx affected command
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run end-to-end tests
+        run: npx nx affected --target=e2e
         working-directory: src/client
